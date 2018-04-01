@@ -1,6 +1,8 @@
 package mapp
 
-import "unicode/utf8"
+import (
+	"unicode/utf8"
+)
 
 // import "fmt"
 
@@ -24,28 +26,28 @@ type Transliterater struct {
 	//special single rune in devanagari which result in
 	//multiple runes in kannda
 	//eg: ॐ
-	composites map[rune]string
+	Composites map[rune]string
 
 	//diff b/w normal code points
-	codePointDiff rune
+	CodePointDiff rune
 }
 
 var DevanagariToKannada = Transliterater{
-	composites:    map[rune]string{'ॐ': "ಓಂ"},
-	codePointDiff: 896}
+	Composites:    map[rune]string{'ॐ': "ಓಂ"},
+	CodePointDiff: 896}
 
 var KannadaToDevanagari = Transliterater{
-	composites:    make(map[rune]string),
-	codePointDiff: -896}
+	Composites:    make(map[rune]string),
+	CodePointDiff: -896}
 
 func (t Transliterater) To(c rune) <-chan rune {
 	//if a single rune results in a string after transliterate
-	if key, ok := t.composites[c]; ok {
+	if key, ok := t.Composites[c]; ok {
 		return RuneReader([]rune(key)...)
 	}
 
 	var r rune
-	r = c + t.codePointDiff
+	r = c + t.CodePointDiff
 	if !utf8.ValidRune(r) {
 		r = c
 	}
