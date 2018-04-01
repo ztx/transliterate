@@ -1,4 +1,4 @@
-package script
+package language
 
 func isKannda(c rune) bool {
 	if c >= '\u0C80' && c <= '\u0CF2' {

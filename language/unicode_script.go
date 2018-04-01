@@ -1,59 +1,59 @@
-package script
+package language
 
 import (
 	//"fmt"
-	"github.com/ztx/transliterate/mapp"
-	"golang.org/x/text/language"
+	mapp "github.com/ztx/transliterate/mapp"
+	lan "golang.org/x/text/language"
 )
 
 type Script struct {
-	language     language.Tag
-	unicodeStart rune
-	unicodeEnd   rune
+	language     lan.Tag
+	UnicodeStart rune
+	UnicodeEnd   rune
 
 	//map of functions providing transliteration to other languages
-	transliterationFuncs map[language.Tag]mapp.RuneMapper
+	transliterationFuncs map[lan.Tag]mapp.RuneMapper
 	// standardizer functions
 	StandardizerFuncs []Standardizer
 }
 
-type unicodeStartEnd map[language.Tag][]rune
+type unicodeStartEnd map[lan.Tag][]rune
 
 type Standardizer interface {
 	Standardize(string) string
 }
 
-func NewScript(lang language.Tag) Script {
-	return Script{language: lang, transliterationFuncs: make(map[language.Tag]mapp.RuneMapper)}
+func NewScript(lang lan.Tag) Script {
+	return Script{language: lang, transliterationFuncs: make(map[lan.Tag]mapp.RuneMapper)}
 }
 
-func NewCustomScript(lang language.Tag, unicodeStart, unicodeEnd rune) Script {
+func NewCustomScript(lang lan.Tag, unicodeStart, unicodeEnd rune) Script {
 	return Script{language: lang,
-		unicodeStart:         unicodeStart,
-		unicodeEnd:           unicodeEnd,
-		transliterationFuncs: make(map[language.Tag]mapp.RuneMapper)}
+		UnicodeStart:         unicodeStart,
+		UnicodeEnd:           unicodeEnd,
+		transliterationFuncs: make(map[lan.Tag]mapp.RuneMapper)}
 }
 
 //ValidRune validates a character to its script
 //ValidRune returns true if
 //the rune is between unicodeStart and unicodeEnd
 func (s *Script) ValidRune(c rune) bool {
-	if c >= s.unicodeStart && c <= s.unicodeEnd {
+	if c >= s.UnicodeStart && c <= s.UnicodeEnd {
 		return true
 	}
 	return false
 }
 
-func (s *Script) RegisterRuneMapper(language language.Tag, runeMapper mapp.RuneMapper) {
+func (s *Script) RegisterRuneMapper(language lan.Tag, runeMapper mapp.RuneMapper) {
 	s.transliterationFuncs[language] = runeMapper
 }
 
-func (s *Script) TransliterateRune(toLanguage language.Tag, c rune) <-chan rune {
+func (s *Script) TransliterateRune(toLanguage lan.Tag, c rune) <-chan rune {
 	runeMapper := s.transliterationFuncs[toLanguage]
 	return runeMapper.To(c)
 }
 
-func (s *Script) TransliterateString(toLanguage language.Tag, str string) string {
+func (s *Script) TransliterateString(toLanguage lan.Tag, str string) string {
 	runeMapper := s.transliterationFuncs[toLanguage]
 	transliteratedStr := ""
 	//i := 0
@@ -75,7 +75,7 @@ func (s *Script) TransliterateString(toLanguage language.Tag, str string) string
 
 //After transliteration not so well known characters may show up which
 //need to be replaced by well known characters
-//Eg: in general-Hindi there is no short e character which present in Kannada (ಎ)
+//Eg: in normal-Hindi there is no short e character which present in Kannada (ಎ)
 func (s *Script) Standardize(str string) string {
 	result := ""
 	for _, f := range s.StandardizerFuncs {

@@ -7,8 +7,8 @@ import (
 	"golang.org/x/text/language/display"
 	"golang.org/x/text/unicode/runenames"
 
+	"github.com/ztx/transliterate/defaults"
 	"github.com/ztx/transliterate/mapp"
-	"github.com/ztx/transliterate/script"
 )
 
 var userPrefs = []language.Tag{
@@ -41,23 +41,14 @@ func main() {
 	fmt.Printf("%c %c %d", r, hr, r-hr)
 	fmt.Printf("\n%c %c %d", hr+898, r, r-hr)
 
-	knUnicodeStart := '\u0C80'
-	knUnicodeEnd := '\u0CF2'
-
-	hnUnicodeStart := '\u0900'
-	hnUnicodeEnd := '\u097F'
-
 	knString := "ಪ್ರಮುಖ ಸುದ್ದಿಗಳೆ ಎ"
 	hnString := "ॐ ही होता  है ॰"
 
-	kn := script.NewCustomScript(language.Kannada, knUnicodeStart, knUnicodeEnd)
-	kn.RegisterRuneMapper(language.Hindi, mapp.KannadaToDevanagari)
-	//fmt.Printf("\n%c", kn.TransliterateRune(language.Hindi, r))
-	fmt.Printf("\n%s", kn.TransliterateString(language.Hindi, knString))
+	defaults.Kannada.RegisterRuneMapper(language.Hindi, mapp.KannadaToDevanagari)
+	defaults.Hindi.RegisterRuneMapper(language.Kannada, mapp.DevanagariToKannada)
 
-	hn := script.NewCustomScript(language.Hindi, hnUnicodeStart, hnUnicodeEnd)
-	hn.RegisterRuneMapper(language.Kannada, mapp.DevanagariToKannada)
-	//fmt.Printf("\n%c", hn.TransliterateRune(language.Kannada, hr))
-	fmt.Printf("\n%s-%s", hnString, hn.TransliterateString(language.Kannada, hnString))
+	fmt.Printf("\n%s", defaults.Kannada.TransliterateString(language.Hindi, knString))
+
+	fmt.Printf("\n%s-%s", hnString, defaults.Hindi.TransliterateString(language.Kannada, hnString))
 
 }
