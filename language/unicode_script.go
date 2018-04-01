@@ -2,7 +2,7 @@ package language
 
 import (
 	//"fmt"
-	mapp "github.com/ztx/transliterate/mapp"
+	 "github.com/ztx/transliterate/mapp"
 	lan "golang.org/x/text/language"
 )
 
@@ -17,14 +17,18 @@ type Script struct {
 	StandardizerFuncs []Standardizer
 }
 
-type unicodeStartEnd map[lan.Tag][]rune
+//type unicodeStartEnd map[lan.Tag][]rune
 
 type Standardizer interface {
 	Standardize(string) string
 }
 
 func NewScript(lang lan.Tag) Script {
-	return Script{language: lang, transliterationFuncs: make(map[lan.Tag]mapp.RuneMapper)}
+	return Script{language: lang,
+			transliterationFuncs: make(map[lan.Tag]mapp.RuneMapper),
+			UnicodeStart:UnicodeStartEnd[lang][0],
+			UnicodeEnd:UnicodeStartEnd[lang][1],
+	}
 }
 
 func NewCustomScript(lang lan.Tag, unicodeStart, unicodeEnd rune) Script {
